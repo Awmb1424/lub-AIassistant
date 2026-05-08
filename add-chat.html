@@ -328,7 +328,7 @@ previewInfo.textContent = analyzeAllChat
       updateProgress(70, 3);
 
       try {
-        const aiResponse = await fetch("/analyze-chat", {
+        const aiResponse = await fetch("https://lub-aiassistant.onrender.com/analyze-chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
