@@ -328,16 +328,16 @@ previewInfo.textContent = analyzeAllChat
       updateProgress(70, 3);
 
       try {
-        const aiResponse = await fetch("http://localhost:3000/analyze-chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            chatText: selectedText,
-            groupName: groupName
-          })
-        });
+        const aiResponse = await fetch("/analyze-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chatText: selectedText,
+          groupName: groupName
+        })
+      });
 
         if (!aiResponse.ok) {
           throw new Error("Server error");
