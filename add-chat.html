@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add New Chat</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="language.js" defer></script>
+</head>
+
+<body>
+  <div class="analysis-overlay" id="analysisOverlay">
+    <div class="analysis-box">
+      <h3 data-i18n-add="aiAnalyzing">AI is analyzing your chats ..</h3>
+
+      <div class="analysis-step" id="step1">
+        <span class="circle pending"></span>
+        <p data-i18n-add="readingMessages">Reading messages</p>
+      </div>
+
+      <div class="analysis-step" id="step2">
+        <span class="circle pending"></span>
+        <p data-i18n-add="identifyInfo">Identify important info</p>
+      </div>
+
+      <div class="analysis-step" id="step3">
+        <span class="circle pending"></span>
+        <p data-i18n-add="extractingTasks">Extracting tasks</p>
+      </div>
+
+      <div class="analysis-step" id="step4">
+        <span class="circle pending"></span>
+        <p data-i18n-add="detectingDeadlines">Detecting deadlines</p>
+      </div>
+
+      <div class="progress-row">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span id="progressText">0%</span>
+      </div>
+
+      <h3 id="waitText" data-i18n-add="pleaseWait">Please wait</h3>
+
+      <button class="view-result-btn" id="viewResultBtn" onclick="goHome()" data-i18n-add="viewResult">
+        View result
+      </button>
+    </div>
+  </div>
+
+  <div class="app">
+
+    <header class="top-section add-header">
+      <div class="status-bar">
+  <span id="liveTime"></span>
+</div>
+
+      <div class="page-title">
+        <button class="back-btn" onclick="goHome()">‹</button>
+        <h2 data-i18n-add="analyzeChatTitle">Analyze Chat</h2>
+      </div>
+    </header>
+
+    <main class="content add-content">
+
+      <section class="chat-section">
+        <h3 data-i18n-add="uploadChatFile">Upload Chat File</h3>
+
+        <div class="chat-card large-chat-card">
+          <h4 data-i18n-add="groupName">Group name</h4>
+          <p data-i18n-add="groupHint">Enter the group name exactly the same every time.</p>
+
+          <input class="chat-input" type="text" id="groupName" placeholder="Example: Family group">
+
+          <h4 data-i18n-add="chatFile">Chat file</h4>
+          <p data-i18n-add="chatHint">Upload exported chat file as .txt</p>
+
+          <input class="chat-input" type="file" id="chatFile" accept=".txt">
+
+          <h4 data-i18n-add="analysisRange">Analysis range</h4>
+          <p data-i18n-add="analysisRangeHint">
+            Enter number of days to analyze, or choose all chat.
+          </p>
+
+          <div class="range-row">
+            <input
+              class="chat-input range-input"
+              type="number"
+              id="analysisDays"
+              min="1"
+              placeholder="3"
+            >
+
+            <label class="all-chat-option">
+              <input type="checkbox" id="analyzeAllChat">
+              <span data-i18n-add="allChat">All chat</span>
+            </label>
+          </div>
+
+          <button class="outline-btn" onclick="processChatFile()" data-i18n-add="analyzeChat">
+            Analyze chat
+          </button>
+
+          <button class="outline-btn" onclick="resetGroupHistory()" data-i18n-add="resetHistory">
+            Reset this group history
+          </button>
+        </div>
+      </section>
+
+      <section class="chat-section">
+        <h3 data-i18n-add="preview">Preview</h3>
+
+        <div class="chat-card preview-card">
+          <h4 id="previewTitle" data-i18n-add="noFileAnalyzed">No file analyzed yet</h4>
+          <p id="previewInfo" data-i18n-add="previewHint">Upload a chat file to see which messages will be summarized.</p>
+
+          <pre id="previewResult"></pre>
+        </div>
+      </section>
+
+    </main>
+
+    <div class="bottom-bar-bg"></div>
+
+    <nav class="bottom-nav">
+  <button onclick="goHome()" class="nav-btn">
+    <span>🏠</span>
+    <span data-i18n="home">Home</span>
+  </button>
+
+  <button class="plus" onclick="goAddChat()">+</button>
+
+  <button onclick="goSettings()" class="nav-btn">
+    <span>⚙️</span>
+    <span data-i18n="setting">Setting</span>
+  </button>
+</nav>
+
+    <div class="home-indicator"></div>
+
+  </div>
+
+  <script>
+    function getCurrentUser() {
+  return JSON.parse(localStorage.getItem("loggedInUser"));
+}
+
+function getUserKey(key) {
+  const user = getCurrentUser();
+
+  if (!user) {
+    window.location.href = "index.html";
+    return null;
+  }
+
+  return `${key}_${user.id}`;
+}
+
+    const addChatTranslations = {
+      en: {
+        home: "Home",
+        setting: "Setting",
+        analyzeChatTitle: "Analyze Chat",
+        uploadChatFile: "Upload Chat File",
+        groupName: "Group name",
+        groupHint: "Enter the group name exactly the same every time.",
+        groupPlaceholder: "Example: Family group",
+        chatFile: "Chat file",
+        chatHint: "Upload exported chat file as .txt",
+        analyzeChat: "Analyze chat",
+        resetHistory: "Reset this group history",
+        preview: "Preview",
+        analysisRange: "Analysis range",
+        analysisRangeHint: "Enter number of days to analyze, or choose all chat.",
+        allChat: "All chat",
+        rangeSelected: "The app selected messages from the last {days} days.",
+        allChatSelected: "The app selected all messages in this chat.",
+        noFileAnalyzed: "No file analyzed yet",
+        previewHint: "Upload a chat file to see which messages will be summarized.",
+        firstTimeSummary: "First time summary",
+        firstTimeInfo: "This is the first time for this group, so the app selected messages from the last 3 days only.",
+        newMessagesOnly: "New messages only",
+        newMessagesInfo: "This group has previous history, so the app selected messages after the last summary only.",
+        noNewMessages: "No new messages found to summarize.",
+        enterGroupAndFile: "Please enter group name and upload a chat file",
+        enterGroupFirst: "Please enter group name first",
+        historyReset: "History reset for this group",
+        aiFailed: "AI analysis failed. Check server or API key.",
+        aiAnalyzing: "AI is analyzing your chats ..",
+        readingMessages: "Reading messages",
+        identifyInfo: "Identify important info",
+        extractingTasks: "Extracting tasks",
+        detectingDeadlines: "Detecting deadlines",
+        pleaseWait: "Please wait",
+        done: "Done!",
+        viewResult: "View result"
+      },
+      ar: {
+        home: "الرئيسية",
+        setting: "الإعدادات",
+        analyzeChatTitle: "تحليل المحادثة",
+        uploadChatFile: "رفع ملف المحادثة",
+        groupName: "اسم القروب",
+        groupHint: "اكتب اسم القروب بنفس الطريقة كل مرة.",
+        groupPlaceholder: "مثال: قروب العائلة",
+        chatFile: "ملف المحادثة",
+        chatHint: "ارفعي ملف المحادثة بصيغة .txt",
+        analyzeChat: "تحليل المحادثة",
+        resetHistory: "إعادة ضبط سجل هذا القروب",
+        preview: "المعاينة",
+        analysisRange: "نطاق التحليل",
+        analysisRangeHint: "اكتبي عدد الأيام المراد تحليلها، أو اختاري كل المحادثة.",
+        allChat: "كل المحادثة",
+        rangeSelected: "اختار التطبيق رسائل آخر {days} أيام.",
+        allChatSelected: "اختار التطبيق كل الرسائل الموجودة في المحادثة.",
+        noFileAnalyzed: "لم يتم تحليل أي ملف بعد",
+        previewHint: "ارفعي ملف محادثة لعرض الرسائل التي سيتم تلخيصها.",
+        firstTimeSummary: "أول تلخيص لهذا القروب",
+        firstTimeInfo: "هذه أول مرة لهذا القروب، لذلك اختار التطبيق رسائل آخر 3 أيام فقط.",
+        newMessagesOnly: "الرسائل الجديدة فقط",
+        newMessagesInfo: "هذا القروب لديه سجل سابق، لذلك اختار التطبيق الرسائل بعد آخر تلخيص فقط.",
+        noNewMessages: "لا توجد رسائل جديدة لتلخيصها.",
+        enterGroupAndFile: "الرجاء كتابة اسم القروب ورفع ملف المحادثة",
+        enterGroupFirst: "الرجاء كتابة اسم القروب أولًا",
+        historyReset: "تمت إعادة ضبط سجل هذا القروب",
+        aiFailed: "فشل تحليل الذكاء الاصطناعي. تحققي من السيرفر أو مفتاح API.",
+        aiAnalyzing: "الذكاء الاصطناعي يحلل المحادثة ..",
+        readingMessages: "قراءة الرسائل",
+        identifyInfo: "تحديد المعلومات المهمة",
+        extractingTasks: "استخراج المهام",
+        detectingDeadlines: "اكتشاف المواعيد النهائية",
+        pleaseWait: "الرجاء الانتظار",
+        done: "تم!",
+        viewResult: "عرض النتيجة"
+      }
+    };
+
+    function getCurrentLang() {
+      return localStorage.getItem("appLanguage") || "en";
+    }
+
+    function tr(key) {
+      const lang = getCurrentLang();
+      return addChatTranslations[lang][key] || addChatTranslations.en[key] || key;
+    }
+
+    function applyAddChatLanguage() {
+      const lang = getCurrentLang();
+
+      document.documentElement.lang = lang;
+      document.body.dir = lang === "ar" ? "rtl" : "ltr";
+
+      document.querySelectorAll("[data-i18n-add]").forEach(element => {
+        const key = element.getAttribute("data-i18n-add");
+        element.textContent = tr(key);
+      });
+
+      const groupInput = document.getElementById("groupName");
+      if (groupInput) {
+        groupInput.placeholder = tr("groupPlaceholder");
+      }
+    }
+
+    function goHome() {
+      window.location.href = "dashboard.html";
+    }
+
+    function goAddChat() {
+      window.location.href = "add-chat.html";
+    }
+
+    function goSettings() {
+      window.location.href = "settings.html";
+    }
+
+    async function processChatFile() {
+      const groupName = document.getElementById("groupName").value.trim();
+      const file = document.getElementById("chatFile").files[0];
+      const analyzeAllChat =
+      document.getElementById("analyzeAllChat").checked;
+
+      const analysisDays =
+      Number(document.getElementById("analysisDays").value) || 3;
+
+      const previewTitle = document.getElementById("previewTitle");
+      const previewInfo = document.getElementById("previewInfo");
+      const previewResult = document.getElementById("previewResult");
+
+      if (!groupName || !file) {
+        alert(tr("enterGroupAndFile"));
+        return;
+      }
+
+      const text = await file.text();
+
+      let selectedText = analyzeAllChat
+  ? getAllChatMessages(text)
+  : getMessagesByDays(text, analysisDays);
+
+previewTitle.textContent = analyzeAllChat
+  ? tr("allChat")
+  : tr("analysisRange");
+
+previewInfo.textContent = analyzeAllChat
+  ? tr("allChatSelected")
+  : tr("rangeSelected").replace("{days}", analysisDays);
+
+      if (selectedText.trim() === "") {
+        previewResult.textContent = tr("noNewMessages");
+        return;
+      }
+
+      previewResult.textContent = selectedText;
+
+
+      showAnalysisPopup();
+
+      updateProgress(20, 1);
+
+      await delay(700);
+
+      updateProgress(45, 2);
+
+      await delay(700);
+
+      updateProgress(70, 3);
+
+      try {
+        const aiResponse = await fetch("http://localhost:3000/analyze-chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chatText: selectedText,
+            groupName: groupName
+          })
+        });
+
+        if (!aiResponse.ok) {
+          throw new Error("Server error");
+        }
+
+        const aiResult = await aiResponse.json();
+
+        aiResult.tasks = (aiResult.tasks || []).map(task => ({
+          ...task,
+          groupName: groupName
+        }));
+
+        aiResult.deadlines = (aiResult.deadlines || []).map(deadline => ({
+          ...deadline,
+          groupName: groupName
+        }));
+
+        aiResult.importantMessages =
+          (aiResult.importantMessages || []).map(message => ({
+            ...message,
+            groupName: groupName
+          }));
+
+        const aiKey = getUserKey("aiSummaryResult");
+if (!aiKey) return;
+
+localStorage.setItem(aiKey, JSON.stringify(aiResult));
+
+        await delay(700);
+
+        updateProgress(100, 4);
+        finishAnalysis();
+
+      } catch (error) {
+        console.error(error);
+        alert(tr("aiFailed"));
+      }
+    }
+
+    function getMessagesByDays(text, days) {
+  const lines = text.split("\n");
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  startDate.setHours(0, 0, 0, 0);
+
+  return lines.filter(line => {
+    const date = extractDateFromLine(line);
+
+    if (!date) return false;
+
+    const messageDate = new Date(date);
+    messageDate.setHours(0, 0, 0, 0);
+
+    return messageDate >= startDate;
+  }).join("\n");
+}
+
+function getAllChatMessages(text) {
+  return text
+    .split("\n")
+    .filter(line => extractDateFromLine(line))
+    .join("\n");
+}
+
+    function getLast3DaysMessages(text) {
+      const lines = text.split("\n");
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+      return lines.filter(line => {
+        const date = extractDateFromLine(line);
+        return date && date >= threeDaysAgo;
+      }).join("\n");
+    }
+
+    function getMessagesAfterDate(text, lastDate) {
+      const lines = text.split("\n");
+
+      return lines.filter(line => {
+        const date = extractDateFromLine(line);
+        return date && date > lastDate;
+      }).join("\n");
+    }
+
+    function extractDateFromLine(line) {
+      const cleanLine = line
+        .replace(/[\u200e\u200f\u202a-\u202e]/g, "")
+        .replace(/‏/g, "")
+        .trim();
+
+      let match = cleanLine.match(
+        /^\[?(\d{4})\/(\d{1,2})\/(\d{1,2})[،,]?\s*(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(ص|م|AM|PM)?\]?/i
+      );
+
+      let year, month, day, hour, minute, period;
+
+      if (match) {
+        year = parseInt(match[1], 10);
+        month = parseInt(match[2], 10);
+        day = parseInt(match[3], 10);
+        hour = parseInt(match[4], 10);
+        minute = parseInt(match[5], 10);
+        period = match[7];
+      } else {
+        match = cleanLine.match(
+          /^\[?(\d{1,2})\/(\d{1,2})\/(\d{2,4})[،,]\s*(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(ص|م|AM|PM)?\]?/i
+        );
+
+        if (!match) return null;
+
+        day = parseInt(match[1], 10);
+        month = parseInt(match[2], 10);
+        year = parseInt(match[3], 10);
+        hour = parseInt(match[4], 10);
+        minute = parseInt(match[5], 10);
+        period = match[7];
+
+        if (year < 100) year += 2000;
+      }
+
+      if (period) {
+        const p = period.toUpperCase();
+        if ((p === "م" || p === "PM") && hour !== 12) hour += 12;
+        if ((p === "ص" || p === "AM") && hour === 12) hour = 0;
+      }
+
+      return new Date(year, month - 1, day, hour, minute);
+    }
+
+    function getLatestMessageDate(text) {
+      const lines = text.split("\n");
+      let latestDate = null;
+
+      lines.forEach(line => {
+        const date = extractDateFromLine(line);
+
+        if (date && (!latestDate || date > latestDate)) {
+          latestDate = date;
+        }
+      });
+
+      return latestDate;
+    }
+
+    function resetGroupHistory() {
+      const groupName = document.getElementById("groupName").value.trim();
+
+      if (!groupName) {
+        alert(tr("enterGroupFirst"));
+        return;
+      }
+
+      localStorage.removeItem("lastSummary_" + groupName);
+      alert(tr("historyReset"));
+    }
+
+    function showAnalysisPopup() {
+      applyAddChatLanguage();
+
+      document.getElementById("analysisOverlay").style.display = "flex";
+      document.getElementById("viewResultBtn").style.display = "none";
+      document.getElementById("waitText").textContent = tr("pleaseWait");
+
+      for (let i = 1; i <= 4; i++) {
+        const circle = document.querySelector(`#step${i} .circle`);
+        circle.classList.add("pending");
+        circle.textContent = "";
+      }
+
+      document.getElementById("progressFill").style.width = "0%";
+      document.getElementById("progressText").textContent = "0%";
+    }
+
+    function updateProgress(percent, activeStep) {
+      document.getElementById("progressFill").style.width = percent + "%";
+      document.getElementById("progressText").textContent = percent + "%";
+
+      for (let i = 1; i <= activeStep; i++) {
+        const circle = document.querySelector(`#step${i} .circle`);
+        circle.classList.remove("pending");
+        circle.textContent = "✓";
+      }
+    }
+
+    function finishAnalysis() {
+      document.getElementById("waitText").textContent = tr("done");
+      document.getElementById("viewResultBtn").style.display = "block";
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function updateLiveTime() {
+  const now = new Date();
+
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+
+  minutes = minutes < 10
+    ? "0" + minutes
+    : minutes;
+
+  document.getElementById("liveTime").textContent =
+    `${hours}:${minutes}`;
+}
+
+setInterval(updateLiveTime, 1000);
+
+updateLiveTime();
+
+    window.addEventListener("load", function () {
+      applyAddChatLanguage();
+    });
+  </script>
+
+</body>
+</html>

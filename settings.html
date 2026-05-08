@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css" />
+
+  <style>
+    *{
+      font-family: "GS SS Text Light", "Poppins", sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <header class="top-section add-header">
+
+      <div class="status-bar">
+      <span id="liveTime"></span>
+      </div>
+
+      <div class="page-title">
+        <button class="back-btn" onclick="goHome()">‹</button>
+        <h2 data-i18n="setting">Setting</h2>
+      </div>
+
+    </header>
+
+    <main class="content settings-content">
+
+      <div class="settings-logo">
+        <img src="logo.png" alt="Logo">
+      </div>
+
+      <h3 class="app-name">Lub AI Assistant</h3>
+
+      <div class="settings-card">
+        <!-- Profile -->
+
+        <div class="settings-item profile-item">
+
+          <div class="profile-text">
+
+            <p>
+              <strong data-i18n="usernameLabel">
+                Username:
+              </strong>
+
+              <span id="profileUsername"></span>
+            </p>
+
+            <p>
+              <strong data-i18n="emailLabel">
+                Email:
+              </strong>
+
+              <span id="profileEmail"></span>
+            </p>
+
+            <button class="change-password-btn" onclick="openPasswordModal()">
+              <span data-i18n="changePassword">
+                Change Password
+              </span>
+            </button>
+
+            <button class="outline-btn" onclick="logout()">Logout</button>
+
+          </div>
+
+        </div>
+
+        <!-- Language -->
+
+        <div class="settings-item" onclick="toggleSection('languageOptions', this)">
+          <span data-i18n="languages">Languages</span>
+          <span class="arrow">›</span>
+        </div>
+
+        <div class="settings-options" id="languageOptions">
+
+          <label>
+            <input
+              type="radio"
+              name="language"
+              value="en"
+              onchange="changeLanguage('en')"
+            >
+            English
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="language"
+              value="ar"
+              onchange="changeLanguage('ar')"
+            >
+            العربية
+          </label>
+
+        </div>
+
+        <!-- Notifications -->
+
+        <div class="settings-item" onclick="toggleSection('notificationOptions', this)">
+          <span data-i18n="notification">Notification</span>
+          <span class="arrow">›</span>
+        </div>
+
+        <div class="settings-options" id="notificationOptions">
+
+          <div class="notification-row">
+            <span data-i18n="tasksAlerts">Tasks Alerts</span>
+            <input type="checkbox" id="taskAlerts" onchange="saveNotificationSettings()">
+          </div>
+
+          <div class="notification-row">
+            <span data-i18n="deadlinesAlerts">Deadlines Alerts</span>
+            <input type="checkbox" id="deadlineAlerts" onchange="saveNotificationSettings()">
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <div class="bottom-bar-bg"></div>
+
+    <nav class="bottom-nav">
+
+      <button onclick="goHome()" class="nav-btn">
+        <span>🏠</span>
+        <span data-i18n="home">Home</span>
+      </button>
+
+      <button class="plus" onclick="goAddChat()">+</button>
+
+      <button onclick="goSettings()" class="nav-btn">
+        <span>⚙️</span>
+        <span data-i18n="setting">Setting</span>
+      </button>
+
+    </nav>
+
+    <div class="home-indicator"></div>
+
+    <div class="modal-overlay" id="passwordModal">
+      <div class="modal-box">
+        <h3 data-i18n="changePassword">Change Password</h3>
+
+        <input
+          id="oldPassword"
+          type="password"
+          placeholder="Old password"
+        >
+
+        <input
+          id="newPassword"
+          type="password"
+          placeholder="New password"
+        >
+
+        <input
+          id="confirmPassword"
+          type="password"
+          placeholder="Confirm new password"
+        >
+
+        <div class="modal-actions">
+          <button class="cancel-btn" onclick="closePasswordModal()">Cancel</button>
+          <button class="save-btn" onclick="changePassword()">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="language.js"></script>
+
+  <script>
+    function getCurrentUser() {
+      return JSON.parse(localStorage.getItem("loggedInUser"));
+    }
+
+    function getUserKey(key) {
+      const user = getCurrentUser();
+
+      if (!user) {
+        window.location.href = "index.html";
+        return null;
+      }
+
+      return `${key}_${user.id}`;
+    }
+
+    function goHome() {
+      window.location.href = "dashboard.html";
+    }
+
+    function goAddChat() {
+      window.location.href = "add-chat.html";
+    }
+
+    function goSettings() {
+      window.location.href = "settings.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "index.html";
+    }
+
+    function openPasswordModal() {
+      document.getElementById("passwordModal").style.display = "flex";
+    }
+
+    function closePasswordModal() {
+      document.getElementById("passwordModal").style.display = "none";
+
+      document.getElementById("oldPassword").value = "";
+      document.getElementById("newPassword").value = "";
+      document.getElementById("confirmPassword").value = "";
+    }
+
+    function changePassword() {
+      const oldPassword = document.getElementById("oldPassword").value.trim();
+      const newPassword = document.getElementById("newPassword").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+      const currentUser = getCurrentUser();
+
+      if (!oldPassword || !newPassword || !confirmPassword) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      if (oldPassword !== currentUser.password) {
+        alert("Old password is incorrect");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        alert("New password and confirmation do not match");
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      users = users.map(user => {
+        if (user.id === currentUser.id) {
+          return {
+            ...user,
+            password: newPassword
+          };
+        }
+
+        return user;
+      });
+
+      const updatedUser = {
+        ...currentUser,
+        password: newPassword
+      };
+
+      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+
+      alert("Password changed successfully");
+
+      closePasswordModal();
+    }
+
+    function changeLanguage(lang) {
+      localStorage.setItem(getUserKey("appLanguage"), lang);
+      applyLanguage();
+    }
+
+    function saveNotificationSettings() {
+      localStorage.setItem(
+        getUserKey("taskAlerts"),
+        document.getElementById("taskAlerts").checked
+      );
+
+      localStorage.setItem(
+        getUserKey("deadlineAlerts"),
+        document.getElementById("deadlineAlerts").checked
+      );
+    }
+
+    function loadNotificationSettings() {
+      const taskAlerts =
+        localStorage.getItem(getUserKey("taskAlerts")) !== "false";
+
+      const deadlineAlerts =
+        localStorage.getItem(getUserKey("deadlineAlerts")) !== "false";
+
+      document.getElementById("taskAlerts").checked = taskAlerts;
+      document.getElementById("deadlineAlerts").checked = deadlineAlerts;
+    }
+
+    function loadProfileInfo() {
+      const user = getCurrentUser();
+
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      document.getElementById("profileUsername").textContent = user.username;
+      document.getElementById("profileEmail").textContent = user.email;
+    }
+
+    function toggleSection(id, item) {
+
+      const section = document.getElementById(id);
+
+      const isOpen =
+        section.style.display === "block";
+
+      document.querySelectorAll(".settings-options")
+        .forEach(el => {
+          el.style.display = "none";
+        });
+
+      document.querySelectorAll(".settings-item")
+        .forEach(el => {
+          el.classList.remove("open");
+        });
+
+      if (!isOpen) {
+        section.style.display = "block";
+        item.classList.add("open");
+      }
+    }
+
+    window.onclick = function(e) {
+      if (e.target.classList.contains("modal-overlay")) {
+        closePasswordModal();
+      }
+    };
+
+    function updateLiveTime() {
+  const now = new Date();
+
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+
+  minutes = minutes < 10
+    ? "0" + minutes
+    : minutes;
+
+  document.getElementById("liveTime").textContent =
+    `${hours}:${minutes}`;
+}
+
+setInterval(updateLiveTime, 1000);
+
+updateLiveTime();
+
+    window.onload = function () {
+      applyLanguage();
+      loadProfileInfo();
+      loadNotificationSettings();
+    };
+  </script>
+
+</body>
+</html>

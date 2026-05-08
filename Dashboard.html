@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+
+  <div class="app">
+
+    <header class="top-section">
+      <div class="status-bar">
+      <span id="liveTime"></span>
+      </div>
+
+      <div class="profile">
+        <div class="logo">
+          <img src="logo.png" alt="Labib logo">
+        </div>
+        <p id="welcomeText"></p>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <section class="summary-card">
+        <h2 id="summaryTitle" data-i18n="groupsActive">Your groups are active!</h2>
+
+        <p class="subtitle" id="summaryText" data-i18n="hereMatters">
+          Here is what matters most:
+        </p>
+      </section>
+
+      <div class="notification-card" id="notificationCard">
+      <p id="notificationText"></p>
+      </div>
+
+      <section class="tasks-section">
+        <h3 data-i18n="tasks">Tasks</h3>
+
+        <div class="tasks-card" id="tasksContainer">
+          <button class="outline-btn" onclick="openTaskModal()" data-i18n="addNewTask">Add new task</button>
+        </div>
+      </section>
+
+      <section class="bottom-cards">
+
+        <div class="info-card" id="deadlineCard">
+          <h3 data-i18n="deadlines">Deadlines</h3>
+          <button class="outline-btn" onclick="openDeadlineModal()" data-i18n="addNewDeadline">Add new deadline</button>
+        </div>
+
+        <div class="info-card" id="messagesCard">
+          <h3 data-i18n="importantMessages">Important Messages</h3>
+        </div>
+
+      </section>
+
+    </main>
+
+    <div class="bottom-bar-bg"></div>
+
+    <nav class="bottom-nav">
+  <button onclick="goHome()" class="nav-btn">
+    <span>🏠</span>
+    <span data-i18n="home">Home</span>
+  </button>
+
+  <button class="plus" onclick="goAddChat()">+</button>
+
+  <button onclick="goSettings()" class="nav-btn">
+    <span>⚙️</span>
+    <span data-i18n="setting">Setting</span>
+  </button>
+</nav>
+
+    <div class="home-indicator"></div>
+
+    <div class="modal-overlay" id="taskModal">
+      <div class="modal-box">
+        <h3 data-i18n="addTask">Add Task</h3>
+
+        <input id="taskTitle" placeholder="Task title" data-i18n-placeholder="taskTitlePlaceholder">
+        <input id="taskGroup" placeholder="Group" data-i18n-placeholder="groupPlaceholder">
+        <input id="taskDate" placeholder="Deadline" data-i18n-placeholder="deadlinePlaceholder">
+
+        <div class="modal-actions">
+          <button class="cancel-btn" onclick="closeTaskModal()" data-i18n="cancel">Cancel</button>
+          <button class="save-btn" onclick="addTask()" data-i18n="add">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="deadlineModal">
+      <div class="modal-box">
+        <h3 data-i18n="addDeadline">Add Deadline</h3>
+
+        <input id="deadlineTitle" placeholder="Title" data-i18n-placeholder="titlePlaceholder">
+        <input id="deadlineDate" placeholder="Date" data-i18n-placeholder="datePlaceholder">
+
+        <div class="modal-actions">
+          <button class="cancel-btn" onclick="closeDeadlineModal()" data-i18n="cancel">Cancel</button>
+          <button class="save-btn" onclick="addDeadline()" data-i18n="add">Add</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="language.js"></script>
+
+  <script>
+    function loadWelcomeName() {
+  const user =
+    JSON.parse(localStorage.getItem("loggedInUser"));
+
+  if (!user) return;
+
+  const lang =
+    localStorage.getItem(getUserKey("appLanguage")) || "en";
+
+  document.getElementById("welcomeText").textContent =
+    lang === "ar"
+      ? `مرحبًا، ${user.username}`
+      : `Hello, ${user.username}`;
+}
+
+  function getCurrentUser() {
+    return JSON.parse(localStorage.getItem("loggedInUser"));
+  }
+
+  function getUserKey(key) {
+    const user = getCurrentUser();
+
+    if (!user) {
+      window.location.href = "index.html";
+      return null;
+    }
+
+    return `${key}_${user.id}`;
+  }
+
+  const dashboardTranslations = {
+    en: {
+      noTasks: "No tasks detected yet",
+      noDeadlines: "No deadlines detected yet",
+      noMessages: "No important messages detected yet",
+      chatInactive: "Your chats are quiet for now",
+      nothingFound: "No new tasks, deadlines, or important messages were found.",
+      home: "Home",
+      setting: "Setting",
+      hello: "Hello, Amjad",
+      groupsActive: "Your groups are active!",
+      chatSummarized: "Your chat is summarized!",
+      hereMatters: "Here is what matters most:",
+      tasksFound: "Tasks found",
+      deadlinesDetected: "Deadlines detected",
+      importantFound: "Important messages found",
+      tasks: "Tasks",
+      deadlines: "Deadlines",
+      importantMessages: "Important Messages",
+      addNewTask: "Add new task",
+      addNewDeadline: "Add new deadline",
+      addTask: "Add Task",
+      addDeadline: "Add Deadline",
+      taskTitlePlaceholder: "Task title",
+      groupPlaceholder: "Group",
+      deadlinePlaceholder: "Deadline",
+      titlePlaceholder: "Title",
+      datePlaceholder: "Date",
+      cancel: "Cancel",
+      add: "Add",
+      fillAllFields: "Fill all fields",
+      homeIcon: "🏠",
+      settingIcon: "⚙️"
+    },
+    ar: {
+      home: "الرئيسية",
+      setting: "الإعدادات",
+      hello: "مرحبًا، أمجاد",
+      groupsActive: "قروباتك نشطة!",
+      noTasks: "لا توجد مهام حتى الآن",
+      noDeadlines: "لا توجد مواعيد نهائية حتى الآن",
+      noMessages: "لا توجد رسائل مهمة حتى الآن",
+      chatInactive: "محادثاتك هادئة حاليًا",
+      nothingFound: "لم يتم العثور على مهام أو مواعيد أو رسائل مهمة جديدة.",
+      chatSummarized: "تم تلخيص المحادثة!",
+      hereMatters: "إليك أهم ما تحتاجين معرفته:",
+      tasksFound: "مهام تم العثور عليها",
+      deadlinesDetected: "مواعيد نهائية تم اكتشافها",
+      importantFound: "رسائل مهمة تم العثور عليها",
+      tasks: "المهام",
+      deadlines: "المواعيد النهائية",
+      importantMessages: "الرسائل المهمة",
+      addNewTask: "إضافة مهمة جديدة",
+      addNewDeadline: "إضافة موعد نهائي",
+      addTask: "إضافة مهمة",
+      addDeadline: "إضافة موعد نهائي",
+      taskTitlePlaceholder: "عنوان المهمة",
+      groupPlaceholder: "القروب",
+      deadlinePlaceholder: "الموعد النهائي",
+      titlePlaceholder: "العنوان",
+      datePlaceholder: "التاريخ",
+      cancel: "إلغاء",
+      add: "إضافة",
+      fillAllFields: "يرجى تعبئة جميع الحقول",
+      homeIcon: "🏠",
+      settingIcon: "⚙️"
+    }
+  };
+
+  function showDashboardNotification() {
+    const taskAlerts =
+      localStorage.getItem(getUserKey("taskAlerts")) !== "false";
+
+    const deadlineAlerts =
+      localStorage.getItem(getUserKey("deadlineAlerts")) !== "false";
+
+    const allTasks =
+      JSON.parse(localStorage.getItem(getUserKey("allTasks"))) || [];
+
+    const allDeadlines =
+      JSON.parse(localStorage.getItem(getUserKey("allDeadlines"))) || [];
+
+    const urgentTasks = taskAlerts
+      ? allTasks.filter(task =>
+          checkUrgency(task.deadline || "") === "urgent"
+        )
+      : [];
+
+    const urgentDeadlines = deadlineAlerts
+      ? allDeadlines.filter(deadline =>
+          checkUrgency(deadline.date || "") === "urgent"
+        )
+      : [];
+
+    const totalUrgent =
+      urgentTasks.length + urgentDeadlines.length;
+
+    const card = document.getElementById("notificationCard");
+    const text = document.getElementById("notificationText");
+
+    if (totalUrgent === 0) {
+      card.classList.remove("show");
+      text.textContent = "";
+      return;
+    }
+
+    const lang = getLang();
+
+    text.textContent = lang === "ar"
+      ? `🔔 لديك ${totalUrgent} مهمة أو موعد قريب يحتاج انتباهك.`
+      : `🔔 You have ${totalUrgent} urgent task/deadline that needs attention.`;
+
+    card.classList.add("show");
+  }
+
+  function getLang() {
+    return localStorage.getItem(getUserKey("appLanguage")) || "en";
+  }
+
+  function tr(key) {
+    const lang = getLang();
+
+    if (dashboardTranslations[lang] && dashboardTranslations[lang][key]) {
+      return dashboardTranslations[lang][key];
+    }
+
+    if (dashboardTranslations.en[key]) {
+      return dashboardTranslations.en[key];
+    }
+
+    return key;
+  }
+
+  function applyDashboardLanguage() {
+    const lang = getLang();
+
+    document.documentElement.lang = lang;
+    document.body.dir = lang === "ar" ? "rtl" : "ltr";
+
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+      const key = element.getAttribute("data-i18n");
+      element.textContent = tr(key);
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+      const key = element.getAttribute("data-i18n-placeholder");
+      element.placeholder = tr(key);
+    });
+  }
+
+  function goHome() {
+    window.location.href = "dashboard.html";
+  }
+
+  function goAddChat() {
+    window.location.href = "add-chat.html";
+  }
+
+  function goSettings() {
+    window.location.href = "settings.html";
+  }
+
+  function openTaskModal() {
+    document.getElementById("taskModal").style.display = "flex";
+  }
+
+  function closeTaskModal() {
+    document.getElementById("taskModal").style.display = "none";
+  }
+
+  function openDeadlineModal() {
+    document.getElementById("deadlineModal").style.display = "flex";
+  }
+
+  function closeDeadlineModal() {
+    document.getElementById("deadlineModal").style.display = "none";
+  }
+
+  function checkUrgency(text) {
+    if (!text) return "";
+
+    const raw = text.toString().trim();
+    const lower = raw.toLowerCase();
+
+    if (
+      lower.includes("today") ||
+      lower.includes("tomorrow") ||
+      lower.includes("yesterday") ||
+      lower.includes("اليوم") ||
+      lower.includes("بكرة") ||
+      lower.includes("غدًا") ||
+      lower.includes("أمس")
+    ) {
+      return "urgent";
+    }
+
+    const match = raw.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+
+    if (!match) return "";
+
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const day = Number(match[3]);
+
+    const deadlineDate = new Date(year, month, day);
+    deadlineDate.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (deadlineDate <= tomorrow) {
+      return "urgent";
+    }
+
+    return "";
+  }
+
+  function addTask() {
+    const title = document.getElementById("taskTitle").value.trim();
+    const group = document.getElementById("taskGroup").value.trim();
+    const date = document.getElementById("taskDate").value.trim();
+
+    if (!title || !group || !date) {
+      alert(tr("fillAllFields"));
+      return;
+    }
+
+    let allTasks =
+      JSON.parse(localStorage.getItem(getUserKey("allTasks"))) || [];
+
+    allTasks.push({
+      title: title,
+      groupName: group,
+      deadline: date
+    });
+
+    localStorage.setItem(
+      getUserKey("allTasks"),
+      JSON.stringify(allTasks)
+    );
+
+    renderTasks(allTasks);
+    updateSummaryStats();
+    showDashboardNotification();
+
+    document.getElementById("taskTitle").value = "";
+    document.getElementById("taskGroup").value = "";
+    document.getElementById("taskDate").value = "";
+
+    closeTaskModal();
+  }
+
+  function addDeadline() {
+    const title = document.getElementById("deadlineTitle").value.trim();
+    const date = document.getElementById("deadlineDate").value.trim();
+
+    if (!title || !date) {
+      alert(tr("fillAllFields"));
+      return;
+    }
+
+    let allDeadlines =
+      JSON.parse(localStorage.getItem(getUserKey("allDeadlines"))) || [];
+
+    allDeadlines.push({
+      title: title,
+      date: date
+    });
+
+    localStorage.setItem(
+      getUserKey("allDeadlines"),
+      JSON.stringify(allDeadlines)
+    );
+
+    renderDeadlines(allDeadlines);
+    updateSummaryStats();
+    showDashboardNotification();
+
+    document.getElementById("deadlineTitle").value = "";
+    document.getElementById("deadlineDate").value = "";
+
+    closeDeadlineModal();
+  }
+
+  function completeTask(checkbox) {
+    const taskElement = checkbox.closest(".task");
+    const index = Number(taskElement.dataset.index);
+
+    if (checkbox.checked) {
+      taskElement.style.opacity = "0.5";
+      taskElement.style.textDecoration = "line-through";
+
+      const timer = setTimeout(function() {
+        let allTasks =
+          JSON.parse(localStorage.getItem(getUserKey("allTasks"))) || [];
+
+        allTasks.splice(index, 1);
+
+        localStorage.setItem(
+          getUserKey("allTasks"),
+          JSON.stringify(allTasks)
+        );
+
+        renderTasks(allTasks);
+        updateSummaryStats();
+        showDashboardNotification();
+      }, 5000);
+
+      taskElement.dataset.deleteTimer = timer;
+
+    } else {
+      clearTimeout(taskElement.dataset.deleteTimer);
+
+      taskElement.style.opacity = "1";
+      taskElement.style.textDecoration = "none";
+    }
+  }
+
+  function deleteItem(button) {
+    const item = button.parentElement;
+    const type = item.dataset.type;
+    const index = Number(item.dataset.index);
+
+    if (type === "task") {
+      let allTasks =
+        JSON.parse(localStorage.getItem(getUserKey("allTasks"))) || [];
+
+      allTasks.splice(index, 1);
+
+      localStorage.setItem(
+        getUserKey("allTasks"),
+        JSON.stringify(allTasks)
+      );
+
+      renderTasks(allTasks);
+    }
+
+    if (type === "deadline") {
+      let allDeadlines =
+        JSON.parse(localStorage.getItem(getUserKey("allDeadlines"))) || [];
+
+      allDeadlines.splice(index, 1);
+
+      localStorage.setItem(
+        getUserKey("allDeadlines"),
+        JSON.stringify(allDeadlines)
+      );
+
+      renderDeadlines(allDeadlines);
+    }
+
+    if (type === "message") {
+      let allMessages =
+        JSON.parse(localStorage.getItem(getUserKey("allMessages"))) || [];
+
+      allMessages.splice(index, 1);
+
+      localStorage.setItem(
+        getUserKey("allMessages"),
+        JSON.stringify(allMessages)
+      );
+
+      renderMessages(allMessages);
+    }
+
+    updateSummaryStats();
+    showDashboardNotification();
+  }
+
+  window.onclick = function(e) {
+    if (e.target.classList.contains("modal-overlay")) {
+      closeTaskModal();
+      closeDeadlineModal();
+    }
+  };
+
+  function loadAIResult() {
+    const savedResult =
+      JSON.parse(localStorage.getItem(getUserKey("aiSummaryResult")));
+
+    let allTasks =
+      JSON.parse(localStorage.getItem(getUserKey("allTasks"))) || [];
+
+    let allDeadlines =
+      JSON.parse(localStorage.getItem(getUserKey("allDeadlines"))) || [];
+
+    let allMessages =
+      JSON.parse(localStorage.getItem(getUserKey("allMessages"))) || [];
+
+    if (savedResult) {
+      allTasks = [...allTasks, ...(savedResult.tasks || [])];
+      allDeadlines = [...allDeadlines, ...(savedResult.deadlines || [])];
+      allMessages = [...allMessages, ...(savedResult.importantMessages || [])];
+
+      localStorage.setItem(
+        getUserKey("allTasks"),
+        JSON.stringify(allTasks)
+      );
+
+      localStorage.setItem(
+        getUserKey("allDeadlines"),
+        JSON.stringify(allDeadlines)
+      );
+
+      localStorage.setItem(
+        getUserKey("allMessages"),
+        JSON.stringify(allMessages)
+      );
+
+      localStorage.removeItem(getUserKey("aiSummaryResult"));
+    }
+
+    const hasResults =
+      allTasks.length || allDeadlines.length || allMessages.length;
+
+    document.getElementById("summaryTitle").textContent =
+      hasResults ? tr("chatSummarized") : tr("chatInactive");
+
+    updateSummaryStats();
+
+    renderTasks(allTasks);
+    renderDeadlines(allDeadlines);
+    renderMessages(allMessages);
+  }
+
+  function updateSummaryStats() {
+    const allTasks =
+      JSON.parse(localStorage.getItem(getUserKey("allTasks"))) || [];
+
+    const allDeadlines =
+      JSON.parse(localStorage.getItem(getUserKey("allDeadlines"))) || [];
+
+    const allMessages =
+      JSON.parse(localStorage.getItem(getUserKey("allMessages"))) || [];
+
+    const hasResults =
+      allTasks.length || allDeadlines.length || allMessages.length;
+
+    if (!hasResults) {
+      document.getElementById("summaryText").innerHTML = `
+        <p class="summary-item">${tr("nothingFound")}</p>
+      `;
+      return;
+    }
+
+    document.getElementById("summaryText").innerHTML = `
+      <p class="summary-item">${allTasks.length} ${tr("tasksFound")}</p>
+      <p class="summary-item">${allDeadlines.length} ${tr("deadlinesDetected")}</p>
+      <p class="summary-item">${allMessages.length} ${tr("importantFound")}</p>
+    `;
+  }
+
+  function renderTasks(tasks) {
+    const container = document.getElementById("tasksContainer");
+    const addButton = container.querySelector(".outline-btn");
+
+    container.querySelectorAll(".task").forEach(e => e.remove());
+    container.querySelectorAll(".empty-state").forEach(e => e.remove());
+
+    if (tasks.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent = tr("noTasks");
+
+      container.insertBefore(empty, addButton);
+      return;
+    }
+
+    tasks.forEach((task, index) => {
+      const urgencyClass = checkUrgency(task.deadline || "");
+
+      const item = document.createElement("div");
+
+      item.className = "task";
+      item.dataset.type = "task";
+      item.dataset.index = index;
+
+      item.innerHTML = `
+        <input type="checkbox" onchange="completeTask(this)">
+
+        <div>
+          <h4>${task.title}</h4>
+          <p>${task.groupName || ""}</p>
+        </div>
+
+        <span class="date ${urgencyClass}">
+          ${task.deadline || ""}
+        </span>
+
+        <button class="delete-btn" onclick="deleteItem(this)">
+          ×
+        </button>
+      `;
+
+      container.insertBefore(item, addButton);
+    });
+  }
+
+  function renderDeadlines(deadlines) {
+    const container = document.getElementById("deadlineCard");
+    const addButton = container.querySelector(".outline-btn");
+
+    container.querySelectorAll(".deadline").forEach(e => e.remove());
+    container.querySelectorAll(".empty-state").forEach(e => e.remove());
+
+    if (deadlines.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent = tr("noDeadlines");
+
+      container.insertBefore(empty, addButton);
+      return;
+    }
+
+    deadlines.forEach((deadline, index) => {
+      const urgencyClass = checkUrgency(deadline.date || "");
+
+      const item = document.createElement("div");
+
+      item.className = "deadline";
+      item.dataset.type = "deadline";
+      item.dataset.index = index;
+
+      item.innerHTML = `
+        <h4>${deadline.title}</h4>
+
+        <p class="${urgencyClass}">
+          <strong>${deadline.groupName || ""}</strong> - ${deadline.date || ""}
+        </p>
+
+        <button class="delete-btn" onclick="deleteItem(this)">
+          ×
+        </button>
+      `;
+
+      container.insertBefore(item, addButton);
+    });
+  }
+
+  function renderMessages(messages) {
+    const container = document.getElementById("messagesCard");
+
+    container.querySelectorAll(".message").forEach(e => e.remove());
+    container.querySelectorAll(".empty-state").forEach(e => e.remove());
+
+    if (messages.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent = tr("noMessages");
+
+      container.appendChild(empty);
+      return;
+    }
+
+    messages.forEach((message, index) => {
+      const item = document.createElement("div");
+
+      item.className = "message";
+      item.dataset.type = "message";
+      item.dataset.index = index;
+
+      item.innerHTML = `
+        <h4>${message.title}</h4>
+
+        <p>
+          <strong>${message.groupName || ""}</strong> - ${message.details || ""}
+        </p>
+
+        <button class="delete-btn" onclick="deleteItem(this)">
+          ×
+        </button>
+      `;
+
+      container.appendChild(item);
+    });
+  }
+
+  function updateLiveTime() {
+  const now = new Date();
+
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+
+  minutes = minutes < 10
+    ? "0" + minutes
+    : minutes;
+
+  document.getElementById("liveTime").textContent =
+    `${hours}:${minutes}`;
+}
+
+setInterval(updateLiveTime, 1000);
+
+updateLiveTime();
+
+  window.onload = function () {
+    applyDashboardLanguage();
+    loadAIResult();
+    showDashboardNotification();
+    loadWelcomeName();
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>لُب</title>
+
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+
+<body>
+
+
+
+  <div class="phone">
+
+
+
+    <!-- Welcome Screen -->
+
+    <div class="screen active" id="welcome">
+
+
+
+      <div class="logo big">
+        <img src="logo.png" alt="Lub logo">
+      </div>
+
+
+
+      <h1>Welcome!</h1>
+
+
+
+      <p>
+
+        Turn messy group chats into
+
+        <br>
+
+        clear insight.
+
+      </p>
+
+
+
+      <button onclick="go('signin')">
+
+        Get Started
+
+      </button>
+
+
+
+    </div>
+
+
+
+    <!-- Sign In -->
+
+    <div class="screen" id="signin">
+
+
+
+      <div class="topbar">
+
+        ‹ Sign in
+
+      </div>
+
+
+
+      <div class="card">
+
+
+
+        <h2>Welcome Back</h2>
+
+
+
+        <div class="logo">
+          <img src="logo.png" alt="Lub logo">
+        </div>
+
+
+
+        <input
+
+          id="signinEmail"
+
+          type="text"
+
+          placeholder="Email or Username"
+
+        >
+
+
+
+        <input
+
+          id="signinPassword"
+
+          type="password"
+
+          placeholder="Password"
+
+        >
+
+
+
+        <div id="signinMessage" class="message-box"></div>
+
+
+
+        <button onclick="signin()">
+
+          Sign in
+
+        </button>
+
+
+
+        <p class="link">
+
+          Don't have an account?
+
+          <span onclick="go('signup')">
+
+            Sign up
+
+          </span>
+
+        </p>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <!-- Sign Up -->
+
+    <div class="screen" id="signup">
+
+
+
+      <div class="topbar">
+
+        ‹ Sign up
+
+      </div>
+
+
+
+      <div class="card">
+
+
+
+        <h2>Create Account</h2>
+
+
+
+        <div class="logo">
+          <img src="logo.png" alt="Lub logo">
+        </div>
+
+
+
+        <input
+
+          id="signupEmail"
+
+          type="email"
+
+          placeholder="Email"
+
+        >
+
+
+
+        <input
+
+          id="signupUsername"
+
+          type="text"
+
+          placeholder="Username"
+
+        >
+
+
+
+        <input
+
+          id="signupPassword"
+
+          type="password"
+
+          placeholder="Password"
+
+        >
+
+
+
+        <div id="signupMessage" class="message-box"></div>
+
+
+
+        <button onclick="signup()">
+
+          Sign up
+
+        </button>
+
+
+
+        <p class="link">
+
+          Already have an account?
+
+          <span onclick="go('signin')">
+
+            Sign in
+
+          </span>
+
+        </p>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <!-- Home -->
+
+    <div class="screen" id="home">
+
+
+
+      <div class="home-box">
+
+
+
+        <div class="logo">
+          <img src="logo.png" alt="Lub logo">
+        </div>
+
+
+
+        <h2 id="welcomeUser">
+
+          Welcome
+
+        </h2>
+
+
+
+        <p>
+
+          You are logged in successfully
+
+        </p>
+
+
+
+        <button onclick="logout()">
+
+          Logout
+
+        </button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <script src="script.js"></script>
+
+
+
+</body>
+
+</html>
