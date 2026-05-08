@@ -103,9 +103,6 @@
             Analyze chat
           </button>
 
-          <button class="outline-btn" onclick="resetGroupHistory()" data-i18n-add="resetHistory">
-            Reset this group history
-          </button>
         </div>
       </section>
 
@@ -483,17 +480,6 @@ function getAllChatMessages(text) {
       return latestDate;
     }
 
-    function resetGroupHistory() {
-      const groupName = document.getElementById("groupName").value.trim();
-
-      if (!groupName) {
-        alert(tr("enterGroupFirst"));
-        return;
-      }
-
-      localStorage.removeItem("lastSummary_" + groupName);
-      alert(tr("historyReset"));
-    }
 
     function showAnalysisPopup() {
       applyAddChatLanguage();
