@@ -547,6 +547,23 @@ body[dir="rtl"] .bottom-nav button:not(.plus) {
   margin-top: auto;
 }
 
+.export-help {
+  font-size: 12px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  color: #666;
+}
+
+.export-help a {
+  color: #5b4bdb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.export-help a:hover {
+  text-decoration: underline;
+} 
+
 .chat-input {
   width: 100%;
   margin: 8px 0 14px;
