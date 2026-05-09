@@ -78,14 +78,15 @@
           <h4 data-i18n-add="chatFile">Chat file</h4>
           <p data-i18n-add="chatHint">Upload exported chat file as .txt or as .zip</p>
           <p class="export-help">
-          Need help exporting WhatsApp chats?
+          <span data-i18n-add="exportHelpText">Need help exporting WhatsApp chats?</span>
           <a 
             href="https://faq.whatsapp.com/1180414079177245/?cms_platform=iphone&helpref=platform_switcher"
             target="_blank"
+            data-i18n-add="exportHelpLink"
           >
             Click here
           </a>
-        </p>
+          </p>
 
           <input class="chat-input" type="file" id="chatFile" accept=".txt,.zip">
 
@@ -175,6 +176,8 @@ function getUserKey(key) {
         groupHint: "Enter the group name exactly the same every time.",
         groupPlaceholder: "Example: Family group",
         chatFile: "Chat file",
+        exportHelpText: "Need help exporting WhatsApp chats?",
+        exportHelpLink: "Click here",
         chatHint: "Upload exported chat file as .txt or .zip",
         analyzeChat: "Analyze chat",
         resetHistory: "Reset this group history",
@@ -210,6 +213,8 @@ function getUserKey(key) {
         analyzeChatTitle: "تحليل المحادثة",
         uploadChatFile: "رفع ملف المحادثة",
         groupName: "اسم القروب",
+        exportHelpText: "تحتاجين مساعدة في تصدير محادثات واتساب؟",
+        exportHelpLink: "اضغطي هنا",
         groupHint: "اكتب اسم القروب بنفس الطريقة كل مرة.",
         groupPlaceholder: "مثال: قروب العائلة",
         chatFile: "ملف المحادثة",
