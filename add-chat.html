@@ -245,8 +245,8 @@ function getUserKey(key) {
     };
 
     function getCurrentLang() {
-      return localStorage.getItem("appLanguage") || "en";
-    }
+  return localStorage.getItem(getUserKey("appLanguage")) || "en";
+}
 
     function tr(key) {
       const lang = getCurrentLang();
