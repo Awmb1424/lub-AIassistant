@@ -61,7 +61,7 @@ const translations = {
     resetHistory: "إعادة ضبط سجل هذا القروب",
     preview: "معاينة",
     noFile: "لم يتم تحليل أي ملف بعد",
-    previewHint: "ارفعي ملف محادثة لعرض الرسائل التي سيتم تلخيصها.",
+    previewHint: "ارفع ملف محادثة لعرض الرسائل التي سيتم تلخيصها.",
     profile: "الملف الشخصي",
     usernameLabel: "اسم المستخدم:",
     emailLabel: "البريد الإلكتروني:",
